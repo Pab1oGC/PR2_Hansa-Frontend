@@ -2,7 +2,7 @@ import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Login';
 import Register from './pages/Register';
-import VerifiCode from './pages/VerifiCode';
+import VerifyCode from './pages/account/VerifyCode';
 
 
 function App() {
@@ -10,8 +10,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/Register" element={<Register />} />
-        <Route path="/VerifiCode" element={<VerifiCode />} />
+        <Route path="/account/register" element={<Register />} />
+        <Route path="/account/verify-code" element={<VerifyCode />} />
       </Routes>
     </BrowserRouter>
   );
