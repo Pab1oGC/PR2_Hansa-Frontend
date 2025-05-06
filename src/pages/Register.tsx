@@ -1,81 +1,163 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="flex w-full max-w-4xl bg-white rounded-lg shadow-lg">
-                <div className="w-1/2 p-8 bg-red-600 rounded-l-lg flex flex-col justify-center items-center">
-                    <h1 className="text-4xl font-bold text-white mb-4">UNIVALLE</h1>
-                    <p className="text-white text-center">
-                        Tu plataforma académica para organizar, compartir y colaborar en tus archivos de estudio. Accede a todos tus documentos desde cualquier lugar.
-                    </p>
-                </div>
-                <div className="w-1/2 p-8 bg-gray-50 rounded-r-lg">
-                    <h2 className="text-2xl font-semibold mb-6">Crear Cuenta</h2>
-                    <form>
-                        <div className="mb-4">
-                            <label htmlFor="email" className="block text-sm font-bold text-gray-700 text-left">
-                                EMAIL
-                            </label>
-                            <input
-                                type="email"
-                                id="email"
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="email" className="block text-sm font-bold text-gray-700 text-left">
-                                USUARIO
-                            </label>
-                            <input
-                                type="text"
-                                id="usuario"
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="password" className="block text-sm font-bold text-gray-700 text-left">CONTRASEÑA</label>
-                            <div className="relative">
-                                <input
-                                    type="password"
-                                    id="password"
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                />
-                                <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
-                                    <i className="fas fa-eye"></i>
-                                </span>
-                            </div>
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="password" className="block text-sm font-bold text-gray-700 text-left">CONFIRMAR CONTRASEÑA</label>
-                            <div className="relative">
-                                <input
-                                    type="password"
-                                    id="password"
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                />
-                                <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
-                                    <i className="fas fa-eye"></i>
-                                </span>
-                            </div>
-                        </div>
-                        <div className="mb-4">
-                            <label className="inline-flex items-center">
-                                <input type="checkbox" className="form-checkbox text-blue-600" />
-                                <span className="ml-2 text-sm text-gray-700">Acepto los <a href="/VerifiCode" className="text-blue-600">Términos y Condiciones</a></span>
-                            </label>
-                        </div>
-                        <div>
-                            <button
-                                type="submit"
-                                className="w-full py-2 px-4 bg-red-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                            >
-                                Crear Cuenta
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Las contraseñas no coinciden.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          username: formData.username,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Error al registrar.");
+        return;
+      }
+
+      setSuccess("¡Usuario registrado con éxito!");
+
+      // Esperar 2 segundos antes de redirigir
+      setTimeout(() => {
+        navigate("/", { state: { registered: true } });
+      }, 2000);
+    } catch {
+      setError("Error de conexión con el servidor.");
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen px-4 bg-gray-100">
+      {/* Notificación */}
+      {(error || success) && (
+        <div
+          className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-lg shadow-md text-white text-sm transition duration-300 ${
+            error ? "bg-red-600" : "bg-green-600"
+          }`}
+        >
+          {error || success}
         </div>
-    );
+      )}
+
+      <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden">
+        {/* Panel izquierdo */}
+        <div className="w-full md:w-1/2 p-6 md:p-8 bg-red-600 flex flex-col justify-center items-center text-center">
+          <h1 className="text-4xl font-bold text-white mb-4">UNIVALLE</h1>
+          <p className="text-white text-sm md:text-base">
+            Tu plataforma académica para organizar, compartir y colaborar en tus archivos de estudio.
+          </p>
+        </div>
+
+        {/* Panel derecho */}
+        <div className="w-full md:w-1/2 p-6 md:p-8 bg-gray-50">
+          <h2 className="text-2xl font-semibold mb-6 text-center md:text-left">Crear Cuenta</h2>
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="email" className="block text-sm font-bold text-gray-700">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="username" className="block text-sm font-bold text-gray-700">
+                Usuario
+              </label>
+              <input
+                type="text"
+                id="username"
+                required
+                value={formData.username}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-bold text-gray-700">
+                Contraseña
+              </label>
+              <input
+                type="password"
+                id="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-bold text-gray-700">
+                Confirmar Contraseña
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                className="w-full py-2 px-4 bg-red-600 text-white font-semibold rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Crear Cuenta
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 };
+
 export default Register;
