@@ -16,7 +16,7 @@ const SidebarNavigation = () => {
       {/* Mobile Hamburger Button */}
       <button
         onClick={toggleSidebar}
-        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-gray-800 text-white lg:hidden focus:outline-none focus:ring-2 focus:ring-gray-600"
+        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white text-[var(--color-primary)] hover:bg-gray-100 xl:hidden focus:outline-none focus:ring-2 focus:ring-gray-600"
         aria-label="Toggle Sidebar"
       >
         {isOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
@@ -25,14 +25,14 @@ const SidebarNavigation = () => {
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-30 xl:hidden"
           onClick={toggleSidebar}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-40 h-full w-64 bg-white dark:bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
+        className={`fixed top-0 left-0 z-40 h-full w-64 bg-white dark:bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} xl:translate-x-0`}
       >
         {/* Profile Section */}
         <div className="flex flex-col items-center py-8 border-b border-gray-200 dark:border-gray-700">
