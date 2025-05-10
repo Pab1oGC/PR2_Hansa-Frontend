@@ -1,30 +1,26 @@
-/**
- * src/pages/account/VerifyCode.jsx
- */
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const VALIDITY_DURATION_MS = 2 * 60 * 1000;
 
-const VerifyCode = () => {
+const VerifyCode: React.FC = () => {
   const navigate = useNavigate();
-  const [code, setCode] = useState(Array(6).fill(""));
-  const [validCode, setValidCode] = useState(generateCode());
-  const [codeGeneratedAt, setCodeGeneratedAt] = useState(Date.now());
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [resendCooldown, setResendCooldown] = useState(30); // segundos
+  const [code, setCode] = useState<string[]>(Array(6).fill(""));
+  const [validCode, setValidCode] = useState<string>(generateCode());
+  const [codeGeneratedAt, setCodeGeneratedAt] = useState<number>(Date.now());
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState<number>(30); // segundos
   const codeFilled = code.every((digit) => digit !== "");
 
   useEffect(() => {
-    let timer;
+    let timer: NodeJS.Timeout;
     if (resendCooldown > 0) {
       timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
     }
     return () => clearTimeout(timer);
   }, [resendCooldown]);
 
-  const handleChange = (e, index) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const value = e.target.value;
 
     if (!/^[0-9]?$/.test(value)) return;
@@ -36,19 +32,18 @@ const VerifyCode = () => {
 
     if (value.length === 1 && index < 5) {
       setTimeout(() => {
-      document.getElementById(`code-${index + 1}`)?.focus();
+        document.getElementById(`code-${index + 1}`)?.focus();
       }, 50);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fullCode = code.join("");
     if (Date.now() - codeGeneratedAt > VALIDITY_DURATION_MS) {
       setErrorMessage("⚠️ El código ha expirado. Solicita uno nuevo.");
     } else if (fullCode !== validCode) {
       setErrorMessage("❌ El código ingresado es inválido.");
-      //alert("Por favor, completa los 6 dígitos.");
     } else {
       alert("✅ Código verificado correctamente.");
       setErrorMessage(null);
@@ -57,7 +52,7 @@ const VerifyCode = () => {
 
   const handleResend = () => {
     if (resendCooldown === 0) {
-      const newCode = generateCode();
+      const newGenerated = generateCode();
       setValidCode(newGenerated);
       setCode(Array(6).fill(""));
       setErrorMessage(null);
@@ -84,8 +79,19 @@ const VerifyCode = () => {
 
         {/* Panel Derecho */}
         <div className="bg-[#eaf5ff] p-6 sm:p-8 flex flex-col justify-center">
-          <button onClick={() => navigate(-1) || navigate('/login')} className="mb-6 self-start rounded-full border border-[#0c3c60] hover:bg-[#0c3c60]/10 transition p-2 w-10 h-10 flex items-center justify-center group" aria-label="Volver">
-            <svg className="w-5 h-5 text-[#0c3c60] group-hover:text-[#0a2f4a] transition" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <button
+            onClick={() => navigate(-1) || navigate("/login")}
+            className="mb-6 self-start rounded-full border border-[#0c3c60] hover:bg-[#0c3c60]/10 transition p-2 w-10 h-10 flex items-center justify-center group"
+            aria-label="Volver"
+          >
+            <svg
+              className="w-5 h-5 text-[#0c3c60] group-hover:text-[#0a2f4a] transition"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path>
             </svg>
           </button>
@@ -110,7 +116,7 @@ const VerifyCode = () => {
                   id={`code-${index}`}
                   type="text"
                   inputMode="numeric"
-                  maxLength="1"
+                  maxLength={1}
                   autoComplete="one-time-code"
                   autoFocus={index === 0}
                   value={digit}
@@ -139,14 +145,26 @@ const VerifyCode = () => {
               ))}
             </div>
 
-            <button type="submit" disabled={!codeFilled} className={`w-full py-2 rounded transition text-white font-semibold ${codeFilled ? "bg-[#0c3c60] hover:bg-[#092d49]" : "bg-[#b0c4d6] cursor-not-allowed"}`}>
+            <button
+              type="submit"
+              disabled={!codeFilled}
+              className={`w-full py-2 rounded transition text-white font-semibold ${
+                codeFilled ? "bg-[#0c3c60] hover:bg-[#092d49]" : "bg-[#b0c4d6] cursor-not-allowed"
+              }`}
+            >
               Confirmar
             </button>
           </form>
 
           <div className="text-sm mt-6 text-center text-gray-600">
             ¿No recibiste el código?{" "}
-            <button onClick={handleResend} disabled={resendCooldown > 0} className={`font-semibold ${resendCooldown > 0 ? "text-gray-400 cursor-not-allowed" : "text-[#0c3c60] hover:underline"}`}>
+            <button
+              onClick={handleResend}
+              disabled={resendCooldown > 0}
+              className={`font-semibold ${
+                resendCooldown > 0 ? "text-gray-400 cursor-not-allowed" : "text-[#0c3c60] hover:underline"
+              }`}
+            >
               {resendCooldown > 0 ? `Reenviar en ${resendCooldown}s` : "Volver a enviar"}
             </button>
           </div>
@@ -156,7 +174,7 @@ const VerifyCode = () => {
   );
 };
 
-function generateCode() {
+function generateCode(): string {
   return Array.from({ length: 6 }, () =>
     Math.floor(Math.random() * 10).toString()
   ).join("");
