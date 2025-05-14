@@ -5,6 +5,7 @@ import Projects from './pages/Projects';
 import VerifyCode from './features/auth/verifyCode/pages/VerifyCode';
 import Layout from './shared/components/Layout';
 import FileVisualization from './features/repository/pages/FileVisualization';
+import Home from './pages/Home';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         {/* Rutas con Layout */}
         <Route element={<Layout />}>
           <Route path="/file-repository" element={<FileVisualization />} />
+          <Route path="/home" element={<Home />} />
         </Route>
       </Routes>
     </BrowserRouter>

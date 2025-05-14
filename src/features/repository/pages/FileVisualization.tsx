@@ -1,75 +1,73 @@
 import { useState, useEffect, useCallback } from "react";
-import { FiX} from "react-icons/fi";
+import { FiX, FiUpload} from "react-icons/fi";
 import { debounce } from "lodash";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import FileCard from "../components/FileCard";
-import { File } from "../types/file"; // Importa el tipo File desde el archivo correspondiente
-
-
-const mockFiles : File[] = [
-    {
-      id: 1,
-      name: "Documento Importante",
-      description: "Este es un documento muy importante que contiene información crucial para el proyecto.",
-      tags: ["proyecto", "importante", "2023"],
-      access: "publico",
-      fileType: "documento",
-      importance: 5,
-      createdAt: new Date("2023-12-01")
-    },
-    {
-      id: 2,
-      name: "Carpeta de Recursos",
-      description: "Carpeta que contiene recursos generales del departamento.",
-      tags: ["recursos", "general"],
-      access: "privado",
-      fileType: "carpeta",
-      importance: 3,
-      createdAt: new Date("2023-11-15")
-    },
-    {
-      id: 3,
-      name: "Control de Asistencia",
-      description: "Aca esta la asistencia de los alumnos en la gestion 2025.",
-      tags: ["univalle", "importante", "2025"],
-      access: "privado",
-      fileType: "documento",
-      importance: 1,
-      createdAt: new Date("2025-12-01")
-    }
-  ];
+import { File } from "../types/file"; 
+import { fetchPersonalRepositoryId, fetchFilesByRepositoryId } from "../services/filesService";
+import ArchivoModal from "../components/FileModal";
 
   const FileVisualization = () => {
-    const [files, setFiles] = useState(mockFiles);
+    const [showModal, setShowModal] = useState(false);
+    const [files, setFiles] = useState<File[]>([]);
+    const [allFiles, setAllFiles] = useState<File[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
     const [fileType, setFileType] = useState("todos");
     const [importanceLevel, setImportanceLevel] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [repositoryId, setRepositoryId] = useState<string | null>(null);
   
     const debouncedSearch = useCallback(
-      debounce((term : string) => {
+      debounce((term: string) => {
         setLoading(true);
-        const filtered = mockFiles.filter(file =>
-          file.name.toLowerCase().includes(term.toLowerCase())
+        const filtered = allFiles.filter(file =>
+          file.filename.toLowerCase().includes(term.toLowerCase())
         );
         setFiles(filtered);
         setLoading(false);
       }, 300),
-      []
+      [allFiles]
     );
   
     useEffect(() => {
       debouncedSearch(searchTerm);
     }, [searchTerm, debouncedSearch]);
+
+    const fetchAndSetFiles = async (repoId: string) => {
+  setLoading(true);
+  const realFiles = await fetchFilesByRepositoryId(repoId);
+  setAllFiles(realFiles);
+  setFiles(realFiles);
+  setLoading(false);
+};
+
+    // Obtener el repositoryId
+useEffect(() => {
+  const fetchRepoAndFiles = async () => {
+    try {
+      const id = await fetchPersonalRepositoryId();
+      setRepositoryId(id);
+      await fetchAndSetFiles(id);
+    } catch (error) {
+      setRepositoryId("6811be7d956e4955d0db2a01");
+      setLoading(false);
+    }
+  };
+  fetchRepoAndFiles();
+}, []);
   
     const resetFilters = () => {
       setSearchTerm("");
       setDateRange([null, null]);
       setFileType("todos");
       setImportanceLevel(0);
-      setFiles(mockFiles);
+      setFiles([]);
+    };
+
+    const handleUploaded = async () => {
+      console.log("Aca se tendria que refrescar la lista de archivos");
     };
   
     return (
@@ -132,8 +130,29 @@ const mockFiles : File[] = [
             >
               Resetear filtros
             </button>
+            <div className="ml-auto">
+              <button
+                onClick={() => setShowModal(true)}
+                className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
+              >
+                <FiUpload className="text-xl" />
+                Subir Archivo
+              </button>
+
+            </div>
+
+            
+
           </div>
         </div>
+
+        {showModal && repositoryId && (
+          <ArchivoModal
+            onClose={() => setShowModal(false)}
+            repositoryId={repositoryId}
+            onUploaded={handleUploaded}
+          />
+        )}
   
         {loading ? (
           <div className="flex justify-center items-center h-64">
@@ -142,7 +161,7 @@ const mockFiles : File[] = [
         ) : files.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {files.map(file => (
-              <FileCard key={file.id} file={file} />
+              <FileCard key={file._id} file={file} />
             ))}
           </div>
         ) : (
