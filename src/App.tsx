@@ -6,6 +6,7 @@ import VerifyCode from './features/auth/verifyCode/pages/VerifyCode';
 import Layout from './shared/components/Layout';
 import FileVisualization from './features/repository/pages/FileVisualization';
 import Home from './pages/Home';
+import OnlyOfficeEditor from './features/repository/components/OnlyOffice';
 
 
 function App() {
@@ -22,7 +23,9 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/file-repository" element={<FileVisualization />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/editor" element={<OnlyOfficeEditor />} />
         </Route>
+        
       </Routes>
     </BrowserRouter>
   );
