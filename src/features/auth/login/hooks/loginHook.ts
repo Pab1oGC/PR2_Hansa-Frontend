@@ -12,8 +12,12 @@ export const useAuthLogin = () => {
       const data = await login(username, password);
       localStorage.setItem("username", data.user.username);
       onSuccess();
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Error al iniciar sesión.");
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err && err.response && typeof err.response === 'object' && 'data' in err.response && err.response.data && typeof err.response.data === 'object' && 'message' in err.response.data) {
+        setError((err as { response: { data: { message: string } } }).response.data.message);
+      } else {
+        setError("Error al iniciar sesión.");
+      }
     } finally {
       setLoading(false);
     }

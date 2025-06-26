@@ -5,10 +5,12 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import FileCard from "../components/FileCard";
 import { File } from "../types/file"; 
-import { fetchPersonalRepositoryId, fetchFilesByRepositoryId } from "../services/filesService";
+import { fetchFilesByRepositoryId } from "../services/filesService";
 import ArchivoModal from "../components/FileModal";
+import { useParams } from "react-router-dom";
 
-  const FileVisualization = () => {
+
+  const FileUserRepos = () => {
     const [showModal, setShowModal] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
     const [allFiles, setAllFiles] = useState<File[]>([]);
@@ -18,7 +20,7 @@ import ArchivoModal from "../components/FileModal";
     const [importanceLevel, setImportanceLevel] = useState(0);
     const [loading, setLoading] = useState(false);
     const [repositoryId, setRepositoryId] = useState<string | null>(null);
-  
+    const { id } = useParams<{ id: string }>();
     useEffect(() => {
       const handler = debounce((term: string) => {
         setLoading(true);
@@ -47,8 +49,8 @@ import ArchivoModal from "../components/FileModal";
     // Obtener el repositoryId
 useEffect(() => {
   const fetchRepoAndFiles = async () => {
+    if (!id) return;
     try {
-      const id = await fetchPersonalRepositoryId();
       setRepositoryId(id);
       await fetchAndSetFiles(id);
     } catch {
@@ -56,7 +58,7 @@ useEffect(() => {
     }
   };
   fetchRepoAndFiles();
-}, []);
+}, [id]);
   
     const resetFilters = () => {
       setSearchTerm("");
@@ -173,5 +175,5 @@ useEffect(() => {
     );
   };
   
-  export default FileVisualization;
+  export default FileUserRepos;
   

@@ -6,6 +6,10 @@ import VerifyCode from './features/auth/verifyCode/pages/VerifyCode';
 import Layout from './shared/components/Layout';
 import FileVisualization from './features/repository/pages/FileVisualization';
 import Home from './pages/Home';
+import VistaPerfil from './pages/Profile';
+import EditarPerfilPage from './pages/EditProfile';
+import MyRepositoriesPage from './features/repository/pages/MyRepositoriesPage';
+import FileUserRepos from './features/repository/pages/FileUserRepos';
 
 
 function App() {
@@ -17,11 +21,34 @@ function App() {
         <Route path="/account/register" element={<Register />} />
         <Route path="/account/verify-code" element={<VerifyCode />} />
         <Route path="/projects" element={<Projects />} />
-        
+
         {/* Rutas con Layout */}
         <Route element={<Layout />}>
           <Route path="/file-repository" element={<FileVisualization />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/mis-repositorios" element={<MyRepositoriesPage />} />
+          <Route path="/profile" element={<VistaPerfil />} />
+          <Route path="/repositorio/:id" element={<FileUserRepos />} />
+          <Route
+            path="/editar-perfil"
+            element={
+              <EditarPerfilPage
+                onClose={() => {}}
+                onSave={() => {}}
+                initialData={{
+                  nombre: '',
+                  apellido: '',
+                  estado: '',
+                  profesion: '',
+                  institucion: '',
+                  ciudad: '',
+                  contacto: '',
+                  hobbies: [],
+                  profileImage: '',
+                }}
+              />
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>

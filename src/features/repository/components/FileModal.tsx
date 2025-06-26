@@ -56,6 +56,7 @@ const ArchivoModal: React.FC<ArchivoModalProps> = ({ onClose, repositoryId, onUp
       onUploaded();
       onClose();
     } catch (err) {
+      console.error(err);
       alert("Error al subir el archivo.");
     }
     finally {

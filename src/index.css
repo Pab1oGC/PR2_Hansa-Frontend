@@ -8,4 +8,7 @@
     --color-secondary: #808185; /* Gris claro */
     --color-secondarytwo: #424346; /* Gris oscuro */
     --color-accent: #FF7E5F; /* Naranja */
-  }
+}
+.no-scroll {
+  overflow: hidden;
+}

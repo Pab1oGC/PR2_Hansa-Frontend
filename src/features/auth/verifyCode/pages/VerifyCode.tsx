@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { verifyCode } from "../../services/authService"; 
-import { useUser } from "../../../../context/useUser"; 
+
 import CodeInput from "../components/CodeInput"; 
 import ErrorMessage from "../components/ErrorMessage"; 
 import VerificationForm from "../components/VerificationForm"; 
@@ -12,8 +12,7 @@ const VerifyCode: React.FC = () => {
   const [code, setCode] = useState<string[]>(Array(6).fill("")); // Estado para el código
   const [loading, setLoading] = useState(false); // Estado para el botón de carga
   const [error, setError] = useState<string | null>(null); // Estado para los errores
-  const { setUser } = useUser(); // Contexto global para actualizar el usuario
-
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fullCode = code.join(""); // Combina los dígitos del código
@@ -33,12 +32,16 @@ const VerifyCode: React.FC = () => {
       localStorage.setItem("user", JSON.stringify(user));
 
       // Actualiza el contexto global con el usuario
-      setUser(user);
+      
 
       // Navega a la página principal
       navigate("/file-repository");
-    } catch (err: any) {
-      setError(err.message || "Error al verificar el código.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Error al verificar el código.");
+      } else {
+        setError("Error al verificar el código.");
+      }
     } finally {
       setLoading(false);
     }
